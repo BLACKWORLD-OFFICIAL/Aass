@@ -1,7 +1,6 @@
-<!DOCTYPE html>
-<html>
+<!DOCTYPE html><html>
 <head>
-    <title>Real AI Image Generator</title>
+    <title>Realistic AI Image Generator</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -145,11 +144,9 @@
     </style>
 </head>
 <body>
-    <h1>AI Image Generator</h1>
-    
+    <h1>Realistic AI Image Generator</h1>
     <div class="generator-box">
-        <textarea id="prompt-input" placeholder="Example: A beautiful sunset over mountains, photorealistic, 8k..."></textarea>
-        
+        <textarea id="prompt-input" placeholder="Describe what you want to generate..."></textarea>
         <div class="options">
             <div class="option-group">
                 <label for="format">Image Format</label>
@@ -160,148 +157,140 @@
                     <option value="insta">Instagram (4:5)</option>
                 </select>
             </div>
-            
             <div class="option-group">
                 <label for="style">Style</label>
                 <select id="style">
+                    <option value="portrait">Portrait</option>
+                    <option value="landscape">Landscape</option>
+                    <option value="product">Product</option>
+                    <option value="fashion">Fashion</option>
+                </select>
+            </div>
+            <div class="option-group">
+                <label for="type">Type</label>
+                <select id="type">
                     <option value="realistic">Realistic</option>
-                    <option value="anime">Anime</option>
-                    <option value="fantasy">Fantasy</option>
-                    <option value="cyberpunk">Cyberpunk</option>
+                    <option value="neon">Neon</option>
+                    <option value="ai">AI Art</option>
                 </select>
             </div>
         </div>
-        
-        <button class="generate-btn" id="generate-btn">
-            Generate Images 
-            <span class="loading" id="loading" style="display:none"></span>
-        </button>
+        <button class="generate-btn" id="generate-btn">Generate Images <span class="loading" id="loading" style="display:none"></span></button>
     </div>
-    
-    <div class="gallery" id="gallery">
-        <!-- Images will appear here -->
-    </div>
+    <div class="gallery" id="gallery"></div><script>
+    const realisticImages = {
+        portrait: [
+            "https://images.unsplash.com/photo-1534528741775-53994a69daeb",
+            "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
+            "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df",
+            "https://images.unsplash.com/photo-1438761681033-6461ffad8d80"
+        ],
+        landscape: [
+            "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
+            "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05",
+            "https://images.unsplash.com/photo-1447752875215-b2761acb3c5d",
+            "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07"
+        ],
+        product: [
+            "https://images.unsplash.com/photo-1523275335684-37898b6baf30",
+            "https://images.unsplash.com/photo-1546868871-7041f2a55e12",
+            "https://images.unsplash.com/photo-1585386959984-a4155224a1ad",
+            "https://images.unsplash.com/photo-1572635196237-14b3f281503f"
+        ],
+        fashion: [
+            "https://images.unsplash.com/photo-1483985988355-763728e1935b",
+            "https://images.unsplash.com/photo-1520367445093-50dc08a59d9d",
+            "https://images.unsplash.com/photo-1544441893-675973e31985",
+            "https://images.unsplash.com/photo-1551232864-3f0890e580d9"
+        ]
+    };
 
-    <script>
-        // Function to generate AI-like images without API
-        function generateAIImage(prompt, format, style, index) {
-            // Create unique seed based on inputs
-            const seed = (prompt + format + style + index).split('')
-                .reduce((a,b) => a + b.charCodeAt(0), 0);
-            
-            // Get dimensions
-            const dimensions = {
-                'square': '600x600',
-                'tiktok': '540x960',
-                'youtube': '1280x720',
-                'insta': '800x1000'
-            }[format];
-            
-            // Style-specific image sources
-            const sources = {
-                'realistic': 'https://source.unsplash.com/random/',
-                'anime': 'https://placedog.net/',
-                'fantasy': 'https://picsum.photos/seed/',
-                'cyberpunk': 'https://placekitten.com/'
-            };
-            
-            // Return appropriate image URL
-            return sources[style] + dimensions + 
-                (style === 'fantasy' ? seed : `?${encodeURIComponent(prompt)}&${seed}`);
+    document.getElementById('generate-btn').addEventListener('click', function() {
+        const prompt = document.getElementById('prompt-input').value;
+        const format = document.getElementById('format').value;
+        const style = document.getElementById('style').value;
+        const type = document.getElementById('type').value;
+
+        if (!prompt) {
+            alert('Please enter a prompt!');
+            return;
         }
 
-        // When generate button is clicked
-        document.getElementById('generate-btn').addEventListener('click', function() {
-            const prompt = document.getElementById('prompt-input').value;
-            const format = document.getElementById('format').value;
-            const style = document.getElementById('style').value;
-            
-            if (!prompt) {
-                alert('Please enter a prompt!');
-                return;
-            }
-            
-            // Show loading
-            const btn = document.getElementById('generate-btn');
-            const loading = document.getElementById('loading');
-            btn.disabled = true;
-            loading.style.display = 'inline-block';
-            
-            // Clear previous images
-            document.getElementById('gallery').innerHTML = '';
-            
-            // Generate 4 images
-            for (let i = 0; i < 4; i++) {
-                // Create image card immediately
-                const cardId = `card-${Date.now()}-${i}`;
-                createImageCard(cardId, prompt, format, style, true);
-                
-                // Simulate AI generation delay
-                setTimeout(() => {
-                    // Generate AI-like image URL
-                    const imgUrl = generateAIImage(prompt, format, style, i);
-                    
-                    // Update card with image
-                    updateImageCard(cardId, imgUrl, prompt, format, style);
-                }, i * 800);
-            }
-            
-            // Hide loading after all images are loaded
+        const btn = document.getElementById('generate-btn');
+        const loading = document.getElementById('loading');
+        btn.disabled = true;
+        loading.style.display = 'inline-block';
+
+        document.getElementById('gallery').innerHTML = '';
+
+        for (let i = 0; i < 4; i++) {
+            const cardId = `card-${Date.now()}-${i}`;
+            createImageCard(cardId, prompt, format, style, type);
             setTimeout(() => {
-                btn.disabled = false;
-                loading.style.display = 'none';
-            }, 4000);
-        });
-        
-        // Create image card placeholder
-        function createImageCard(id, prompt, format, style, isLoading) {
-            const card = document.createElement('div');
-            card.className = 'image-card';
-            card.id = id;
-            
-            card.innerHTML = `
-                <div class="image-container ${format}">
-                    ${isLoading ? 
-                        '<div class="loading" style="width:40px;height:40px;"></div>' : 
-                        '<img src="" alt="Generated image">'}
-                </div>
-                <div class="image-info">
-                    <div class="image-prompt" title="${prompt}">${prompt}</div>
-                    <div class="image-meta">
-                        <span>${format}</span>
-                        <span>${style}</span>
-                    </div>
-                </div>
-            `;
-            
-            document.getElementById('gallery').appendChild(card);
-            return card;
+                const imgUrl = getRealisticImage(style, i) + getSizeParams(format);
+                updateImageCard(cardId, imgUrl, prompt, format, style, type);
+            }, i * 800);
         }
-        
-        // Update image card with actual image
-        function updateImageCard(id, imgUrl, prompt, format, style) {
-            const card = document.getElementById(id);
-            if (!card) return;
-            
-            const img = card.querySelector('img');
-            if (img) {
-                img.src = imgUrl;
-                img.alt = prompt;
-                
-                // Make image clickable to download
-                img.style.cursor = 'pointer';
-                img.onclick = () => {
-                    const link = document.createElement('a');
-                    link.href = imgUrl;
-                    link.download = `ai-image-${format}-${Date.now()}.jpg`;
-                    link.click();
-                };
-            }
-            
-            // Remove loading spinner
-            const loading = card.querySelector('.loading');
-            if (loading) loading.remove();
+
+        setTimeout(() => {
+            btn.disabled = false;
+            loading.style.display = 'none';
+        }, 4000);
+    });
+
+    function getSizeParams(format) {
+        switch(format) {
+            case 'square': return '?w=600&h=600&fit=crop';
+            case 'tiktok': return '?w=540&h=960&fit=crop';
+            case 'youtube': return '?w=1280&h=720&fit=crop';
+            case 'insta': return '?w=800&h=1000&fit=crop';
+            default: return '?w=600&h=600&fit=crop';
         }
-    </script>
+    }
+
+    function getRealisticImage(style, index) {
+        const images = realisticImages[style];
+        return images[index % images.length];
+    }
+
+    function createImageCard(id, prompt, format, style, type) {
+        const card = document.createElement('div');
+        card.className = 'image-card';
+        card.id = id;
+
+        card.innerHTML = `
+            <div class="image-container ${format}">
+                <div class="loading" style="width:40px;height:40px;"></div>
+            </div>
+            <div class="image-info">
+                <div class="image-prompt" title="${prompt}">${prompt}</div>
+                <div class="image-meta">
+                    <span>${format}</span>
+                    <span>${style}</span>
+                    <span>${type}</span>
+                </div>
+            </div>
+        `;
+
+        document.getElementById('gallery').appendChild(card);
+    }
+
+    function updateImageCard(id, imgUrl, prompt, format, style, type) {
+        const card = document.getElementById(id);
+        if (!card) return;
+
+        const container = card.querySelector('.image-container');
+        container.innerHTML = `<img src="${imgUrl}" alt="${prompt}" style="cursor:pointer">`;
+
+        const img = container.querySelector('img');
+        img.onclick = () => {
+            const link = document.createElement('a');
+            link.href = imgUrl;
+            link.download = `ai-image-${format}-${Date.now()}.jpg`;
+            link.click();
+        };
+    }
+</script>
+
 </body>
 </html>
