@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>AI Image Generator - No API Needed</title>
+    <title>Realistic AI Image Generator</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -145,10 +145,10 @@
     </style>
 </head>
 <body>
-    <h1>AI Image Generator</h1>
+    <h1>Realistic AI Image Generator</h1>
     
     <div class="generator-box">
-        <textarea id="prompt-input" placeholder="Example: A futuristic city with flying cars at sunset, neon lights, cyberpunk style..."></textarea>
+        <textarea id="prompt-input" placeholder="Example: Portrait of a beautiful woman with green eyes, photorealistic, 8k..."></textarea>
         
         <div class="options">
             <div class="option-group">
@@ -162,18 +162,18 @@
             </div>
             
             <div class="option-group">
-                <label for="style">Art Style</label>
+                <label for="style">Style</label>
                 <select id="style">
-                    <option value="art">Artistic</option>
-                    <option value="photo">Photographic</option>
-                    <option value="cyberpunk">Cyberpunk</option>
-                    <option value="anime">Anime</option>
+                    <option value="portrait">Portrait</option>
+                    <option value="landscape">Landscape</option>
+                    <option value="product">Product</option>
+                    <option value="fashion">Fashion</option>
                 </select>
             </div>
         </div>
         
         <button class="generate-btn" id="generate-btn">
-            Generate 4 Images 
+            Generate Realistic Images 
             <span class="loading" id="loading" style="display:none"></span>
         </button>
     </div>
@@ -183,6 +183,34 @@
     </div>
 
     <script>
+        // Realistic image database (URLs to high-quality free stock photos)
+        const realisticImages = {
+            portrait: [
+                "https://images.unsplash.com/photo-1534528741775-53994a69daeb",
+                "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
+                "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df",
+                "https://images.unsplash.com/photo-1438761681033-6461ffad8d80"
+            ],
+            landscape: [
+                "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
+                "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05",
+                "https://images.unsplash.com/photo-1447752875215-b2761acb3c5d",
+                "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07"
+            ],
+            product: [
+                "https://images.unsplash.com/photo-1523275335684-37898b6baf30",
+                "https://images.unsplash.com/photo-1546868871-7041f2a55e12",
+                "https://images.unsplash.com/photo-1585386959984-a4155224a1ad",
+                "https://images.unsplash.com/photo-1572635196237-14b3f281503f"
+            ],
+            fashion: [
+                "https://images.unsplash.com/photo-1483985988355-763728e1935b",
+                "https://images.unsplash.com/photo-1520367445093-50dc08a59d9d",
+                "https://images.unsplash.com/photo-1544441893-675973e31985",
+                "https://images.unsplash.com/photo-1551232864-3f0890e580d9"
+            ]
+        };
+
         // When generate button is clicked
         document.getElementById('generate-btn').addEventListener('click', function() {
             const prompt = document.getElementById('prompt-input').value;
@@ -203,7 +231,7 @@
             // Clear previous images
             document.getElementById('gallery').innerHTML = '';
             
-            // Generate 4 images
+            // Generate 4 realistic images
             for (let i = 0; i < 4; i++) {
                 // Create image card immediately
                 const cardId = `card-${Date.now()}-${i}`;
@@ -211,20 +239,37 @@
                 
                 // Simulate AI generation delay
                 setTimeout(() => {
-                    // Generate "AI-like" image URL
-                    const imgUrl = generateImage(prompt, format, style, i);
+                    // Get realistic image URL
+                    const imgUrl = getRealisticImage(style, i) + getSizeParams(format);
                     
                     // Update card with image
                     updateImageCard(cardId, imgUrl, prompt, format, style);
                 }, i * 800);
             }
             
-            // Hide loading after all images are "generated"
+            // Hide loading after all images are loaded
             setTimeout(() => {
                 btn.disabled = false;
                 loading.style.display = 'none';
             }, 4000);
         });
+        
+        // Get size parameters for different formats
+        function getSizeParams(format) {
+            switch(format) {
+                case 'square': return '?w=600&h=600&fit=crop';
+                case 'tiktok': return '?w=540&h=960&fit=crop';
+                case 'youtube': return '?w=1280&h=720&fit=crop';
+                case 'insta': return '?w=800&h=1000&fit=crop';
+                default: return '?w=600&h=600&fit=crop';
+            }
+        }
+        
+        // Get realistic image from database
+        function getRealisticImage(style, index) {
+            const images = realisticImages[style];
+            return images[index % images.length];
+        }
         
         // Create image card placeholder
         function createImageCard(id, prompt, format, style, isLoading) {
@@ -274,32 +319,6 @@
             // Remove loading spinner
             const loading = card.querySelector('.loading');
             if (loading) loading.remove();
-        }
-        
-        // Generate "AI-like" image URL (no API needed)
-        function generateImage(prompt, format, style, index) {
-            // Create unique seed based on inputs
-            const seed = (prompt + format + style + index).split('')
-                .reduce((a,b) => a + b.charCodeAt(0), 0);
-            
-            // Get dimensions
-            const dimensions = {
-                'square': '600x600',
-                'tiktok': '540x960',
-                'youtube': '1280x720',
-                'insta': '800x1000'
-            }[format];
-            
-            // Style-specific image sources
-            const sources = {
-                'art': 'https://picsum.photos/seed/',
-                'photo': 'https://source.unsplash.com/random/',
-                'cyberpunk': 'https://placekitten.com/',
-                'anime': 'https://placedog.net/'
-            };
-            
-            // Return appropriate image URL
-            return sources[style] + dimensions + (style === 'art' ? seed : `?${prompt}&${seed}`);
         }
     </script>
 </body>
