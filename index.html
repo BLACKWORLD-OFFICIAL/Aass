@@ -1,149 +1,462 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI Image Generator</title>
-  <style>
-    body {
-      background: #0f0f0f;
-      color: #fff;
-      font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-      padding: 0;
-    }
-    header {
-      padding: 20px;
-      text-align: center;
-      background: linear-gradient(90deg, #00f0ff, #ff00ff);
-      color: black;
-      font-size: 2em;
-      font-weight: bold;
-      box-shadow: 0 0 20px #00f0ff;
-    }
-    main {
-      padding: 30px;
-      max-width: 1000px;
-      margin: auto;
-    }
-    .form-box {
-      background: #1a1a1a;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 0 20px #00f0ff44;
-      margin-bottom: 30px;
-    }
-    input, select, button {
-      width: 100%;
-      padding: 15px;
-      margin: 10px 0;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
-    }
-    input, select {
-      background-color: #2a2a2a;
-      color: white;
-    }
-    button {
-      background: linear-gradient(90deg, #00f0ff, #ff00ff);
-      color: black;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 20px;
-    }
-    .card {
-      background: #1a1a1a;
-      border-radius: 10px;
-      overflow: hidden;
-      box-shadow: 0 0 10px #00f0ffaa;
-      position: relative;
-    }
-    .card img {
-      width: 100%;
-      display: block;
-    }
-    .card a {
-      position: absolute;
-      bottom: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #00f0ff;
-      color: black;
-      padding: 6px 14px;
-      border-radius: 6px;
-      text-decoration: none;
-      font-weight: bold;
-      opacity: 0.9;
-    }
-    footer {
-      text-align: center;
-      padding: 20px;
-      background: #141414;
-      color: #888;
-      margin-top: 40px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unlimited AI Image Generator</title>
+    <style>
+        :root {
+            --primary: #6e48aa;
+            --secondary: #9d50bb;
+            --dark: #1a1a2e;
+            --light: #f8f9fa;
+            --neon: #0ff0fc;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--dark), #16213e);
+            color: white;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(to right, var(--neon), #ff00ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+        }
+        
+        .tagline {
+            color: #aaa;
+            font-size: 1.1rem;
+        }
+        
+        .generator-box {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .prompt-box {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        #prompt-input {
+            flex: 1;
+            padding: 1rem;
+            border-radius: 8px;
+            border: none;
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            font-size: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+        }
+        
+        #prompt-input:focus {
+            outline: none;
+            border-color: var(--neon);
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+        }
+        
+        .options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .option-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #ccc;
+        }
+        
+        select, input {
+            width: 100%;
+            padding: 0.8rem;
+            border-radius: 8px;
+            border: none;
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        select:focus, input:focus {
+            outline: none;
+            border-color: var(--neon);
+        }
+        
+        .generate-btn {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            box-shadow: 0 5px 15px rgba(110, 72, 170, 0.4);
+        }
+        
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(110, 72, 170, 0.6);
+        }
+        
+        .generate-btn:disabled {
+            background: #555;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .image-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+            transition: all 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .image-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .image-container {
+            width: 100%;
+            height: 250px;
+            background: rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .image-container img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: cover;
+        }
+        
+        .image-info {
+            padding: 1rem;
+        }
+        
+        .image-prompt {
+            font-size: 0.9rem;
+            color: #aaa;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--neon);
+            animation: spin 1s ease-in-out infinite;
+            margin-left: 10px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .download-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 0.5rem;
+            width: 100%;
+            transition: all 0.3s;
+        }
+        
+        .download-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        @media (max-width: 768px) {
+            .options {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .gallery {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+        }
+    </style>
 </head>
 <body>
-  <header>AI Image Generator</header>
-  <main>
-    <div class="form-box">
-      <input type="text" id="prompt" placeholder="Enter your prompt here...">
-      <select id="ratio">
-        <option value="1024x1024">Square (1:1)</option>
-        <option value="1280x720">YouTube (16:9)</option>
-        <option value="720x1280">TikTok (9:16)</option>
-      </select>
-      <button onclick="generateImages()">Generate Images</button>
+    <div class="container">
+        <header>
+            <h1>Unlimited AI Image Generator</h1>
+            <p class="tagline">Create 4 unique images with every prompt - no restrictions!</p>
+        </header>
+        
+        <div class="generator-box">
+            <div class="prompt-box">
+                <input type="text" id="prompt-input" placeholder="Describe the image you want to create..." autocomplete="off">
+            </div>
+            
+            <div class="options">
+                <div class="option-group">
+                    <label for="style">Style</label>
+                    <select id="style">
+                        <option value="neon">Neon</option>
+                        <option value="realistic">Realistic</option>
+                        <option value="fantasy">Fantasy</option>
+                        <option value="anime">Anime</option>
+                        <option value="digital-art">Digital Art</option>
+                        <option value="photographic">Photographic</option>
+                    </select>
+                </div>
+                
+                <div class="option-group">
+                    <label for="ratio">Aspect Ratio</label>
+                    <select id="ratio">
+                        <option value="1:1">Square (1:1)</option>
+                        <option value="4:5">Portrait (4:5)</option>
+                        <option value="16:9">Landscape (16:9)</option>
+                        <option value="9:16">Vertical (9:16)</option>
+                    </select>
+                </div>
+                
+                <div class="option-group">
+                    <label for="steps">Quality</label>
+                    <select id="steps">
+                        <option value="30">Standard</option>
+                        <option value="50">High</option>
+                        <option value="70">Ultra</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button id="generate-btn" class="generate-btn">
+                Generate 4 Images
+                <span id="loading" class="loading" style="display: none;"></span>
+            </button>
+        </div>
+        
+        <div class="gallery" id="gallery">
+            <!-- Images will appear here -->
+        </div>
     </div>
-    <div class="grid" id="imageGrid"></div>
-  </main>
-  <footer>&copy; 2025 HUZII | All rights reserved</footer>  <script>
-    async function generateImages() {
-      const prompt = document.getElementById("prompt").value;
-      const ratio = document.getElementById("ratio").value.split("x");
-      const width = parseInt(ratio[0]);
-      const height = parseInt(ratio[1]);
-      const grid = document.getElementById("imageGrid");
 
-      if (!prompt) return alert("Please enter a prompt.");
-      grid.innerHTML = '<p style="text-align:center;">Generating images...</p>';
-
-      const res = await fetch("https://api.deepseek.com/v1/images/generate", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer sk-yoURteSTkeY-HerE" // Replace with real key
-        },
-        body: JSON.stringify({
-          prompt: prompt,
-          n: 4,
-          width: width,
-          height: height,
-          model: "deepseek-v1-base"
-        })
-      });
-
-      const data = await res.json();
-      if (!data || !data.data) {
-        grid.innerHTML = '<p style="color:red; text-align:center;">Image generation failed.</p>';
-        return;
-      }
-
-      grid.innerHTML = "";
-      data.data.forEach((item) => {
-        const card = document.createElement("div");
-        card.className = "card";
-        card.innerHTML = `
-          <img src="${item.url}" alt="Generated Image">
-          <a href="${item.url}" download>Download</a>
-        `;
-        grid.appendChild(card);
-      });
-    }
-  </script></body>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const generateBtn = document.getElementById('generate-btn');
+            const promptInput = document.getElementById('prompt-input');
+            const styleSelect = document.getElementById('style');
+            const ratioSelect = document.getElementById('ratio');
+            const stepsSelect = document.getElementById('steps');
+            const gallery = document.getElementById('gallery');
+            const loadingIndicator = document.getElementById('loading');
+            
+            // Replace with your actual Replicate API token
+            const REPLICATE_API_TOKEN = 'your_replicate_api_token_here';
+            
+            generateBtn.addEventListener('click', async function() {
+                const prompt = promptInput.value.trim();
+                if (!prompt) {
+                    alert('Please enter a prompt');
+                    return;
+                }
+                
+                const style = styleSelect.value;
+                const ratio = ratioSelect.value;
+                const steps = parseInt(stepsSelect.value);
+                
+                // Calculate width and height based on ratio
+                let width, height;
+                switch (ratio) {
+                    case '1:1':
+                        width = 512;
+                        height = 512;
+                        break;
+                    case '4:5':
+                        width = 512;
+                        height = 640;
+                        break;
+                    case '16:9':
+                        width = 1024;
+                        height = 576;
+                        break;
+                    case '9:16':
+                        width = 576;
+                        height = 1024;
+                        break;
+                    default:
+                        width = 512;
+                        height = 512;
+                }
+                
+                // Show loading indicator
+                generateBtn.disabled = true;
+                loadingIndicator.style.display = 'inline-block';
+                
+                try {
+                    // Generate 4 images
+                    for (let i = 0; i < 4; i++) {
+                        // Add placeholder card immediately
+                        const placeholderId = `image-${Date.now()}-${i}`;
+                        addImageCard(placeholderId, prompt, true);
+                        
+                        // Generate image
+                        const imageUrl = await generateImage(
+                            `${prompt}, ${style} style`, 
+                            width, 
+                            height,
+                            steps
+                        );
+                        
+                        // Update the card with actual image
+                        updateImageCard(placeholderId, imageUrl);
+                    }
+                } catch (error) {
+                    console.error('Error generating images:', error);
+                    alert('Failed to generate images. Please try again.');
+                } finally {
+                    // Hide loading indicator
+                    generateBtn.disabled = false;
+                    loadingIndicator.style.display = 'none';
+                }
+            });
+            
+            function addImageCard(id, prompt, isLoading) {
+                const card = document.createElement('div');
+                card.className = 'image-card';
+                card.id = id;
+                
+                card.innerHTML = `
+                    <div class="image-container">
+                        ${isLoading ? 
+                            '<div class="loading" style="width: 40px; height: 40px;"></div>' : 
+                            '<img src="" alt="Generated image">'}
+                    </div>
+                    <div class="image-info">
+                        <p class="image-prompt" title="${prompt}">${prompt}</p>
+                        ${isLoading ? '' : '<button class="download-btn">Download</button>'}
+                    </div>
+                `;
+                
+                gallery.insertBefore(card, gallery.firstChild);
+                return card;
+            }
+            
+            function updateImageCard(id, imageUrl) {
+                const card = document.getElementById(id);
+                if (!card) return;
+                
+                const img = card.querySelector('img');
+                const loading = card.querySelector('.image-container .loading');
+                const downloadBtn = card.querySelector('.download-btn');
+                
+                if (img) {
+                    img.src = imageUrl;
+                    img.onload = function() {
+                        if (loading) loading.remove();
+                        
+                        // Add download button
+                        if (!downloadBtn) {
+                            const downloadBtn = document.createElement('button');
+                            downloadBtn.className = 'download-btn';
+                            downloadBtn.textContent = 'Download';
+                            downloadBtn.onclick = function() {
+                                downloadImage(imageUrl, `ai-image-${Date.now()}.png`);
+                            };
+                            card.querySelector('.image-info').appendChild(downloadBtn);
+                        } else {
+                            downloadBtn.onclick = function() {
+                                downloadImage(imageUrl, `ai-image-${Date.now()}.png`);
+                            };
+                        }
+                    };
+                }
+            }
+            
+            async function generateImage(prompt, width, height, steps) {
+                // In a real implementation, you would call your backend or Replicate API here
+                // This is a mock implementation - replace with actual API call
+                
+                // For demo purposes, we'll return a placeholder image
+                // In production, you would:
+                // 1. Call your backend API or directly call Replicate/Stable Diffusion API
+                // 2. Return the generated image URL
+                
+                console.log(`Generating image: ${prompt}, ${width}x${height}, ${steps} steps`);
+                
+                // Simulate API delay
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                // Return a placeholder image (replace with actual API call)
+                return `https://source.unsplash.com/random/${width}x${height}/?${encodeURIComponent(prompt)}&${Date.now()}`;
+            }
+            
+            function downloadImage(url, filename) {
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            }
+            
+            // For demo purposes - remove this in production
+            promptInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    generateBtn.click();
+                }
+            });
+        });
+    </script>
+</body>
 </html>
