@@ -94,9 +94,9 @@
     <div class="form-box">
       <input type="text" id="prompt" placeholder="Enter your prompt here...">
       <select id="ratio">
-        <option value="512x512">Square (1:1)</option>
-        <option value="768x432">YouTube (16:9)</option>
-        <option value="432x768">TikTok (9:16)</option>
+        <option value="1024x1024">Square (1:1)</option>
+        <option value="1280x720">YouTube (16:9)</option>
+        <option value="720x1280">TikTok (9:16)</option>
       </select>
       <button onclick="generateImages()">Generate Images</button>
     </div>
@@ -105,44 +105,45 @@
   <footer>&copy; 2025 HUZII | All rights reserved</footer>  <script>
     async function generateImages() {
       const prompt = document.getElementById("prompt").value;
-      const size = document.getElementById("ratio").value;
-      const [width, height] = size.split('x');
-      const imageGrid = document.getElementById("imageGrid");
+      const ratio = document.getElementById("ratio").value.split("x");
+      const width = parseInt(ratio[0]);
+      const height = parseInt(ratio[1]);
+      const grid = document.getElementById("imageGrid");
 
-      if (!prompt) return alert("Please enter a prompt!");
-      imageGrid.innerHTML = '<p style="text-align:center;">Generating images...</p>';
+      if (!prompt) return alert("Please enter a prompt.");
+      grid.innerHTML = '<p style="text-align:center;">Generating images...</p>';
 
-      const res = await fetch("https://stablediffusionapi.com/api/v3/text2img", {
+      const res = await fetch("https://api.deepseek.com/v1/images/generate", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer sk-yoURteSTkeY-HerE" // Replace with real key
+        },
         body: JSON.stringify({
-          key: "hf-6YLR8xJkI2cFRgKcDnViUYoRWtzMcnXuvB",
           prompt: prompt,
-          negative_prompt: "bad quality, blurry, watermark",
-          width: parseInt(width),
-          height: parseInt(height),
-          samples: 4,
-          num_inference_steps: 30,
-          guidance_scale: 7.5
+          n: 4,
+          width: width,
+          height: height,
+          model: "deepseek-v1-base"
         })
       });
 
       const data = await res.json();
-
-      if (data && data.output) {
-        imageGrid.innerHTML = "";
-        data.output.forEach(url => {
-          const card = document.createElement("div");
-          card.className = "card";
-          card.innerHTML = `
-            <img src="${url}" alt="Generated Image">
-            <a href="${url}" download>Download</a>
-          `;
-          imageGrid.appendChild(card);
-        });
-      } else {
-        imageGrid.innerHTML = '<p style="color:red; text-align:center;">Image generation failed. Try again.</p>';
+      if (!data || !data.data) {
+        grid.innerHTML = '<p style="color:red; text-align:center;">Image generation failed.</p>';
+        return;
       }
+
+      grid.innerHTML = "";
+      data.data.forEach((item) => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <img src="${item.url}" alt="Generated Image">
+          <a href="${item.url}" download>Download</a>
+        `;
+        grid.appendChild(card);
+      });
     }
   </script></body>
 </html>
