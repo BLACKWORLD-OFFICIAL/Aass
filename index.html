@@ -7,209 +7,136 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #1a1a2e;
-            color: white;
+            background-color: #f5f5f5;
             margin: 0;
             padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
         }
+
         .container {
-            width: 100%;
-            max-width: 1200px;
-            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            width: 90%;
+            max-width: 600px;
             text-align: center;
         }
+
         h1 {
-            color: #8a2be2;
-            margin-bottom: 20px;
+            color: #333;
         }
-        .generator-box {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-            margin-bottom: 30px;
+
+        .input-section {
+            margin: 20px 0;
         }
-        #prompt-input {
-            width: 80%;
-            padding: 15px;
-            border-radius: 8px;
-            border: 2px solid #8a2be2;
-            background-color: rgba(0, 0, 0, 0.2);
-            color: white;
-            margin-bottom: 20px;
+
+        input {
+            width: 70%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
             font-size: 16px;
-            min-height: 100px;
         }
-        .options {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-        }
-        .option-group {
-            min-width: 150px;
-        }
-        select {
-            width: 100%;
-            padding: 10px;
-            border-radius: 8px;
-            background-color: rgba(0, 0, 0, 0.3);
+
+        button {
+            padding: 10px 20px;
+            background: #007BFF;
             color: white;
             border: none;
-            font-size: 14px;
-        }
-        .generate-btn {
-            background: linear-gradient(45deg, #8a2be2, #6a1bb5);
-            color: white;
-            padding: 15px 30px;
-            border-radius: 8px;
-            font-size: 18px;
-            border: none;
+            border-radius: 5px;
             cursor: pointer;
-            margin-top: 20px;
-            transition: 0.3s;
-        }
-        .generate-btn:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(138, 43, 226, 0.4);
-        }
-        .loading {
-            display: none;
+            font-size: 16px;
             margin-left: 10px;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-top-color: white;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
         }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+
+        button:hover {
+            background: #0056b3;
         }
-        .gallery {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 25px;
-            margin-top: 30px;
+
+        .result-section {
+            margin-top: 20px;
         }
-        .image-card {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+
+        #image-result img {
+            max-width: 100%;
+            border-radius: 5px;
+            margin-top: 10px;
         }
-        .image-container {
-            background: rgba(0, 0, 0, 0.3);
-            height: 250px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
+
+        .hidden {
+            display: none;
         }
-        .image-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .image-info {
-            padding: 10px;
-            color: #ccc;
-        }
-        .image-prompt {
-            font-size: 14px;
-            margin-bottom: 5px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+
+        .error {
+            color: red;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>AI Image Generator</h1>
-        <div class="generator-box">
-            <textarea id="prompt-input" placeholder="Enter a prompt..."></textarea>
-            <div class="options">
-                <div class="option-group">
-                    <label for="format">Format</label>
-                    <select id="format">
-                        <option value="square">Square (1:1)</option>
-                        <option value="tiktok">TikTok (9:16)</option>
-                        <option value="youtube">YouTube (16:9)</option>
-                        <option value="insta">Instagram (4:5)</option>
-                    </select>
-                </div>
-                <div class="option-group">
-                    <label for="style">Style</label>
-                    <select id="style">
-                        <option value="portrait">Portrait</option>
-                        <option value="landscape">Landscape</option>
-                        <option value="product">Product</option>
-                        <option value="fashion">Fashion</option>
-                    </select>
-                </div>
-            </div>
-            <button class="generate-btn" id="generate-btn">
-                Generate Images
-                <span class="loading" id="loading"></span>
-            </button>
+        <p>Enter a prompt and let AI create an image for you!</p>
+        
+        <div class="input-section">
+            <input type="text" id="prompt-input" placeholder="e.g., cute anime girl in a forest">
+            <button id="generate-btn">Generate Image</button>
         </div>
-
-        <div class="gallery" id="gallery"></div>
+        
+        <div class="result-section">
+            <div id="loading" class="hidden">Generating image... ⏳</div>
+            <div id="image-result"></div>
+        </div>
     </div>
 
     <script>
-        document.getElementById('generate-btn').addEventListener('click', async function () {
-            const prompt = document.getElementById('prompt-input').value;
-            const format = document.getElementById('format').value;
-            const style = document.getElementById('style').value;
+        document.getElementById("generate-btn").addEventListener("click", generateImage);
+
+        async function generateImage() {
+            const prompt = document.getElementById("prompt-input").value;
+            const imageResult = document.getElementById("image-result");
+            const loading = document.getElementById("loading");
 
             if (!prompt) {
-                alert('Please enter a prompt');
+                alert("Please enter a prompt!");
                 return;
             }
 
-            const loading = document.getElementById('loading');
-            loading.style.display = 'inline-block';
-            document.getElementById('generate-btn').disabled = true;
-            document.getElementById('gallery').innerHTML = '';
+            // Show loading
+            imageResult.innerHTML = "";
+            loading.classList.remove("hidden");
 
-            const response = await fetch(`https://api.deepseek.com/v1/generate?prompt=${encodeURIComponent(prompt)}&style=${style}&format=${format}`);
-            const images = await response.json();
+            try {
+                // Replace with your actual API endpoint
+                const apiUrl = `https://text-to-img.apis-bj-devs.workers.dev/?prompt=${encodeURIComponent(prompt)}`;
+                
+                const response = await fetch(apiUrl);
+                
+                if (!response.ok) {
+                    throw new Error("Failed to generate image");
+                }
 
-            for (let i = 0; i < 4; i++) {
-                createImageCard(images[i], prompt, format, style);
+                const data = await response.json();
+                
+                // If the API returns a direct image URL
+                if (data.url) {
+                    imageResult.innerHTML = `<img src="${data.url}" alt="Generated Image">`;
+                } 
+                // If the API returns a base64 image
+                else if (data.image) {
+                    imageResult.innerHTML = `<img src="data:image/png;base64,${data.image}" alt="Generated Image">`;
+                } else {
+                    throw new Error("No image data found");
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                imageResult.innerHTML = `<p class="error">Error: ${error.message}</p>`;
+            } finally {
+                loading.classList.add("hidden");
             }
-
-            loading.style.display = 'none';
-            document.getElementById('generate-btn').disabled = false;
-        });
-
-        function createImageCard(imgUrl, prompt, format, style) {
-            const card = document.createElement('div');
-            card.className = 'image-card';
-
-            card.innerHTML = `
-                <div class="image-container">
-                    <img src="${imgUrl}" alt="Generated Image">
-                </div>
-                <div class="image-info">
-                    <div class="image-prompt">${prompt}</div>
-                    <button class="download-btn" onclick="downloadImage('${imgUrl}', '${format}')">Download</button>
-                </div>
-            `;
-
-            document.getElementById('gallery').appendChild(card);
-        }
-
-        function downloadImage(url, format) {
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `ai-image-${format}-${Date.now()}.jpg`;
-            a.click();
         }
     </script>
 </body>
